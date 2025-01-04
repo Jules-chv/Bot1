@@ -4,7 +4,7 @@ const { MessageEmbed } = require('discord.js');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('convocation')
-        .setDescription('Créer une convocation élégante et professionnelle.')
+        .setDescription('Créer une convocation.')
         .addStringOption(option => 
             option.setName('nom')
                 .setDescription('Nom de la personne concernée')
