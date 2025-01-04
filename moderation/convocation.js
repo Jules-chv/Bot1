@@ -1,33 +1,19 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName('convocation')
-        .setDescription('Créer une convocation.')
-        .addStringOption(option => 
-            option.setName('nom')
-                .setDescription('Nom de la personne concernée')
-                .setRequired(true))
-        .addStringOption(option => 
-            option.setName('raison')
-                .setDescription('Motif de la convocation')
-                .setRequired(true))
-        .addStringOption(option => 
-            option.setName('date')
-                .setDescription('Date et heure de la convocation (ex : 10/01/2025 à 14h)')
-                .setRequired(true))
-        .addStringOption(option => 
-            option.setName('lieu')
-                .setDescription('Lieu de la convocation (ex : Salle des professeurs)')
-                .setRequired(true)),
+    name: 'convocation', // Nom de la commande
+    description: 'Créer une convocation.',
 
-    async execute(interaction) {
-        const nom = interaction.options.getString('nom');
-        const raison = interaction.options.getString('raison');
-        const date = interaction.options.getString('date');
-        const lieu = interaction.options.getString('lieu');
+    async execute(message, args) {
+        // Vérifiez si les arguments sont suffisants
+        if (args.length < 4) {
+            return message.reply('Usage : +convocation <nom> <raison> <date> <lieu>');
+        }
 
+        const [nom, raison, date, ...lieuArr] = args; // Divisez les arguments
+        const lieu = lieuArr.join(' '); // Combinez les arguments restants pour former le lieu
+
+        // Créer l'embed
         const embed = new MessageEmbed()
             .setColor('#007BFF')
             .setTitle('📜 Convocation Officielle')
@@ -41,6 +27,7 @@ module.exports = {
             .setFooter({ text: 'Merci de respecter cet horaire.', iconURL: 'https://example.com/icon.png' })
             .setTimestamp();
 
-        await interaction.reply({ content: `+convocation`, embeds: [embed] });
+        // Envoyer l'embed dans le canal
+        await message.channel.send({ content: `+convocation`, embeds: [embed] });
     },
 };
