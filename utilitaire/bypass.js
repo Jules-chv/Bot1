@@ -14,9 +14,9 @@ module.exports = {
     async execute(client, message, args) {
 
         // Définir les IDs des rôles
-        const perm1 = "ID_ROLE_1";
-        const perm2 = "ID_ROLE_2";
-        const perm3 = "ID_ROLE_3";
+        const perm1 = "1322262932653998141";
+        const perm2 = "1270821764171042937";
+        const perm3 = "1270343799087956032";
 
         // Vérification des permissions
         if (
