@@ -21,6 +21,7 @@ module.exports = {
 
             // Enregistrer la nouvelle couleur
             cl.set(`color_${message.guild.id}`, color);
+            config.bot.couleur.set(`color_${message.guild.id}`, color);
             
             message.channel.send(`La couleur des embed ont été modifiée en ${color}`);
         }
