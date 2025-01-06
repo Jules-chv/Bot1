@@ -1,6 +1,6 @@
 const { MessageEmbed, MessageActionRow, MessageButton } = require("discord.js");
 const db = require("quick.db");
-const random_string = require("randomstring");
+const crypto = require("crypto");
 
 module.exports = {
     name: "warn",
@@ -69,10 +69,7 @@ module.exports = {
             }
 
             const reason = args.slice(2).join(" ") || "Aucune raison";
-            const warnID = random_string.generate({
-                charset: "numeric",
-                length: 8,
-            });
+            const warnID = crypto.randomBytes(4).toString("hex");  // Génère un ID de 8 caractères hexadécimaux
 
             db.push(`info.${message.guild.id}.${user.id}`, {
                 moderator: message.author.tag,
@@ -104,156 +101,6 @@ module.exports = {
                         )
                 );
             }
-        }
-
-        if (subCommand === "list") {
-            const user =
-                message.mentions.users.first() ||
-                client.users.cache.get(args[1]) ||
-                message.author;
-
-            if (!user) {
-                return message.channel.send(
-                    `Aucun membre trouvé pour \`${args[1] || "rien"}\`.`
-                );
-            }
-
-            const warnings = db.fetch(`info.${message.guild.id}.${user.id}`) || [];
-            const warnCount = warnings.length;
-
-            if (warnCount === 0) {
-                return message.channel.send(`${user.tag} n'a aucune sanction.`);
-            }
-
-            let currentPage = 1;
-            const perPage = 5;
-
-            const generateEmbed = () => {
-                const start = (currentPage - 1) * perPage;
-                const end = start + perPage;
-
-                const embed = new MessageEmbed()
-                    .setTitle(`Sanctions de ${user.tag} (${warnCount})`)
-                    .setColor(color)
-                    .setDescription(
-                        warnings
-                            .slice(start, end)
-                            .map(
-                                (warn, index) =>
-                                    `${start + index + 1}) **ID :** \`${warn.id}\`\n**Modérateur :** ${warn.moderator}\n**Raison :** ${warn.reason}\n**Date :** <t:${warn.date}>`
-                            )
-                            .join("\n\n")
-                    )
-                    .setFooter(`Page ${currentPage}/${Math.ceil(warnCount / perPage)}`);
-                return embed;
-            };
-
-            const embed = generateEmbed();
-            const messageButtons = new MessageActionRow().addComponents(
-                new MessageButton()
-                    .setCustomId("prev")
-                    .setLabel("◀")
-                    .setStyle("PRIMARY")
-                    .setDisabled(currentPage === 1),
-                new MessageButton()
-                    .setCustomId("next")
-                    .setLabel("▶")
-                    .setStyle("PRIMARY")
-                    .setDisabled(currentPage === Math.ceil(warnCount / perPage))
-            );
-
-            const msg = await message.channel.send({ embeds: [embed], components: [messageButtons] });
-
-            const collector = msg.createMessageComponentCollector({
-                time: 60000,
-            });
-
-            collector.on("collect", async (interaction) => {
-                if (interaction.user.id !== message.author.id) {
-                    return interaction.reply({
-                        content: "Vous ne pouvez pas interagir avec ce message.",
-                        ephemeral: true,
-                    });
-                }
-
-                if (interaction.customId === "prev") currentPage--;
-                if (interaction.customId === "next") currentPage++;
-
-                await interaction.update({
-                    embeds: [generateEmbed()],
-                    components: [
-                        new MessageActionRow().addComponents(
-                            new MessageButton()
-                                .setCustomId("prev")
-                                .setLabel("◀")
-                                .setStyle("PRIMARY")
-                                .setDisabled(currentPage === 1),
-                            new MessageButton()
-                                .setCustomId("next")
-                                .setLabel("▶")
-                                .setStyle("PRIMARY")
-                                .setDisabled(currentPage === Math.ceil(warnCount / perPage))
-                        ),
-                    ],
-                });
-            });
-
-            collector.on("end", () => {
-                msg.edit({ components: [] });
-            });
-        }
-
-        if (subCommand === "remove") {
-            const user =
-                message.mentions.users.first() ||
-                client.users.cache.get(args[1]);
-
-            const warnID = args[2];
-
-            if (!user) {
-                return message.channel.send(
-                    `Aucun membre trouvé pour \`${args[1] || "rien"}\`.`
-                );
-            }
-
-            const warnings = db.fetch(`info.${message.guild.id}.${user.id}`) || [];
-            const warningIndex = warnings.findIndex((w) => w.id === warnID);
-
-            if (warningIndex === -1) {
-                return message.channel.send(
-                    `Aucune sanction trouvée avec l'ID \`${warnID}\`.`
-                );
-            }
-
-            warnings.splice(warningIndex, 1);
-            db.set(`info.${message.guild.id}.${user.id}`, warnings);
-            db.subtract(`number.${message.guild.id}.${user.id}`, 1);
-
-            return message.channel.send(`La sanction \`${warnID}\` a été retirée.`);
-        }
-
-        if (subCommand === "clear") {
-            const user =
-                message.mentions.users.first() ||
-                client.users.cache.get(args[1]);
-
-            if (!user) {
-                return message.channel.send(
-                    `Aucun membre trouvé pour \`${args[1] || "rien"}\`.`
-                );
-            }
-
-            const warnCount = db.fetch(`number.${message.guild.id}.${user.id}`);
-            if (!warnCount) {
-                return message.channel.send(`${user.tag} n'a aucune sanction.`);
-            }
-
-            db.delete(`number.${message.guild.id}.${user.id}`);
-            db.delete(`info.${message.guild.id}.${user.id}`);
-
-            return message.channel.send(
-                `${warnCount} sanction(s) ont été supprimées pour ${user.tag}.`
-            );
         }
     },
 };
