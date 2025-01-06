@@ -1,6 +1,5 @@
-const { MessageEmbed } = require("discord.js");
+const { MessageEmbed, MessageActionRow, MessageButton } = require("discord.js");
 const db = require("quick.db");
-const { MessageActionRow, MessageButton } = require("discord.js");
 const random_string = require("randomstring");
 
 module.exports = {
@@ -91,8 +90,7 @@ module.exports = {
                 .send(
                     `Vous avez été **warn** sur ${message.guild.name}${
                         reason !== "Aucune raison" ? ` pour \`${reason}\`` : ""
-                    }.`
-                )
+                    }.`)
                 .catch(() => {});
 
             if (logsChannel) {
@@ -102,7 +100,7 @@ module.exports = {
                         .setDescription(
                             `${message.author} a **warn** ${user}${
                                 reason !== "Aucune raison" ? ` pour \`${reason}\`` : ""
-                            }.`
+                            }`
                         )
                 );
             }
