@@ -1,6 +1,6 @@
 const { MessageEmbed } = require("discord.js");
 const db = require("quick.db");
-const { MessageButton, MessageActionRow } = require("discord-buttons");
+const { MessageActionRow, MessageButton } = require("discord.js");
 const random_string = require("randomstring");
 
 module.exports = {
@@ -142,9 +142,7 @@ module.exports = {
                             .slice(start, end)
                             .map(
                                 (warn, index) =>
-                                    `${start + index + 1}) **ID :** \`${warn.id}\`\n**Modérateur :** ${
-                                        warn.moderator
-                                    }\n**Raison :** ${warn.reason}\n**Date :** <t:${warn.date}>`
+                                    `${start + index + 1}) **ID :** \`${warn.id}\`\n**Modérateur :** ${warn.moderator}\n**Raison :** ${warn.reason}\n**Date :** <t:${warn.date}>`
                             )
                             .join("\n\n")
                     )
@@ -196,9 +194,7 @@ module.exports = {
                                 .setCustomId("next")
                                 .setLabel("▶")
                                 .setStyle("PRIMARY")
-                                .setDisabled(
-                                    currentPage === Math.ceil(warnCount / perPage)
-                                )
+                                .setDisabled(currentPage === Math.ceil(warnCount / perPage))
                         ),
                     ],
                 });
