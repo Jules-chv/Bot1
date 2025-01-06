@@ -41,7 +41,6 @@ module.exports = {
             let reason = args.slice(1).join(" ") || `Aucune raison`
 
             message.reply({ content: `${member} a été banni du serveur` }).catch(err => err)
-            member.send({ content: `Tu as été banni par ${message.author} pour la raison suivante: \n\n ${reason}` })
             member.ban({ reason: `${reason}` })
 
             const embed = new Discord.MessageEmbed()
