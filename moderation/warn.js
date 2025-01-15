@@ -25,6 +25,7 @@ module.exports = {
                 const reason = args.slice(2).join(' ') || 'Aucune raison spécifiée';
                 warnsDb.push(`${message.guild.id}_${user.id}`, reason);
                 message.channel.send(`${user.tag} a été averti pour : ${reason}`);
+                message.user.send(`Vous avez été averti sur ${message.guild.name} pour : ${reason}`);
                 break;
 
             case 'list':
@@ -42,6 +43,11 @@ module.exports = {
                 userWarns.splice(warnIndex, 1);
                 warnsDb.set(`${message.guild.id}_${user.id}`, userWarns);
                 message.channel.send(`L\'avertissement numéro ${warnIndex + 1} de ${user.tag} a été supprimé.`);
+                message.user.send('Votre avertissement N°${warnIndex + 1} de raison ' + warnsDb.get(`${message.guild.id}_${user.id}`) + ' a été supprimé sur ${message.guild.name}.');
+                break;
+
+            case 'db':
+                message.reply({ content: warnsDb, flags: MessageFlags.Ephemeral });
                 break;
 
             case 'clear':
